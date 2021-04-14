@@ -1,0 +1,12 @@
+{
+  "-p": {
+    "value": "9999",
+    "usage": "Listen Port",
+    "pattern": "\\d+",
+    "err": "Invalid port"
+  },
+  "-h": {
+    "usage": "show help",
+    "must_have_value": false
+  }
+}

@@ -1,0 +1,4 @@
+github.com/atotto/clipboard v0.1.4 h1:EH0zSVneZPSuFR11BlR9YppQTVDbh5+16AmcJi4g1z4=
+github.com/atotto/clipboard v0.1.4/go.mod h1:ZY9tmq7sm5xIbd9bOK4onWV4S6X0u6GY7Vn0Yu86PYI=
+github.com/tignioj/go-get-argsmap-from-commandline v1.0.1-0.20210414164419-e0bb630be3c5 h1:5grRv0Y7Sz7zJoSFuTBCSQbCWH0NpB673cyv3ACvCSY=
+github.com/tignioj/go-get-argsmap-from-commandline v1.0.1-0.20210414164419-e0bb630be3c5/go.mod h1:KnvHMspKx/NMoKkMOlPhXVRmi3XtBalSJ8n0y4onjuo=

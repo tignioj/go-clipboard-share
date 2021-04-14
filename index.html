@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        .root {
+            padding: 10px;
+        }
+
+        .text, .btn {
+            width: 100%;
+            margin: 3px 0 3px 0;
+        }
+        .text {
+            border: 0;
+        }
+
+        .btn {
+            font-size: 1.5em;
+            padding: 10px 0 10px 0;
+        }
+    </style>
+</head>
+<body>
+<div class="root">
+    <h1 align="center">Clipboard Share</h1>
+    <div>
+        <p>INFO: <span id="info"></span></p>
+    </div>
+    <form onsubmit="return false">
+        <textarea class="text" readonly rows="10" cols="100" name="contentToGet" id="contentToGet">
+        </textarea>
+        <br/>
+        <button class="btn" onclick="getClipBoardFromTextArea()">Copy</button>
+        <br/>
+        <textarea class="text" rows="10" cols="100" placeholder="Paste your content here" name="contentToSet"
+                  id="contentToSet">文本呢~</textarea>
+        <br/>
+        <button class="btn" onclick="setClipboardToServer()">Set Clipboard</button>
+    </form>
+
+</div>
+<script>
+    function setClipboardToServer() {
+        var textDom = document.getElementById("contentToSet")
+        showInfo(textDom.value)
+        var xhr = new XMLHttpRequest()
+        xhr.open("POST", "/set")
+        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+
+        var data = "contentToSet=" + textDom.value
+        xhr.send(data)
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+                showInfo(xhr.responseText)
+            }
+        }
+    }
+
+    function fallbackCopyTextToClipboard(text) {
+        var textArea = document.createElement("textarea");
+        textArea.value = text;
+
+        // Avoid scrolling to bottom
+        textArea.style.top = "0";
+        textArea.style.left = "0";
+        textArea.style.position = "fixed";
+
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+
+        try {
+            var successful = document.execCommand('copy');
+            var msg = successful ? 'successful' : 'unsuccessful';
+            console.log('Fallback: Copying text command was ' + msg);
+            showInfo('Fallback: Copying text command was ' + msg);
+        } catch (err) {
+            console.error('Fallback: Oops, unable to copy', err);
+            showInfo('Fallback: Oops, unable to copy', err);
+        }
+        document.body.removeChild(textArea);
+    }
+
+    function copyTextToClipboard(text) {
+        if (!navigator.clipboard) {
+            fallbackCopyTextToClipboard(text);
+            return;
+        }
+        navigator.clipboard.writeText(text).then(function () {
+            // console.log('Async: Copying to clipboard was successful!');
+            showInfo('Copying to clipboard was successful!')
+        }, function (err) {
+            // console.error('Async: Could not copy text: ', err);
+            showInfo('Copying to clipboard was successful!' + err)
+        });
+    }
+    function getClipBoardFromTextArea() {
+            var copyTextarea = document.querySelector('#contentToGet');
+            copyTextToClipboard(copyTextarea.value)
+    }
+
+    function showInfo(str) {
+        var ele = document.getElementById("info")
+        console.log(ele)
+        ele.innerText = new Date().toLocaleTimeString() + ":" + str
+    }
+</script>
+</body>
+</html>
