@@ -50,7 +50,9 @@
         xhr.open("POST", "/set")
         xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
 
-        var data = "contentToSet=" + textDom.value
+        val = encodeURIComponent(textDom.value)
+        var data = "contentToSet=" + val
+
         xhr.send(data)
         xhr.onreadystatechange = function () {
             if (xhr.readyState === 4 && xhr.status === 200) {

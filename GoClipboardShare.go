@@ -11,13 +11,23 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"syscall"
 )
 
+const (
+	cfUnicodetext = 13
+)
 //v1
 func getText() (string, error) {
 	content, err := clipboard.ReadAll()
 	if err != nil {
-		return "Get clipboard to server failure:" + err.Error(), err
+		// BUGFIX: Check Clipboard is Empty
+		u := syscall.MustLoadDLL("user32")
+		isClipboardFormatAvailable := u.MustFindProc("IsClipboardFormatAvailable")
+		if formatAvailable, _, _ := isClipboardFormatAvailable.Call(cfUnicodetext); formatAvailable == 0 {
+			return "", nil
+		}
+		return "", errors.New("Get clipboard to server failure:" + err.Error())
 	}
 	return content, nil
 }
@@ -98,7 +108,9 @@ func indexView(w http.ResponseWriter, r *http.Request) {
 	contentToGet, err := getText()
 	if err != nil {
 		w.Write([]byte(err.Error()))
+		return
 	}
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	contentToGet = html.EscapeString(contentToGet)
 	var index = `
 <!DOCTYPE html>
@@ -154,7 +166,9 @@ func indexView(w http.ResponseWriter, r *http.Request) {
         xhr.open("POST", "/set")
         xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
 
-        var data = "contentToSet=" + textDom.value
+        val = encodeURIComponent(textDom.value)
+        var data = "contentToSet=" + val
+
         xhr.send(data)
         xhr.onreadystatechange = function () {
             if (xhr.readyState === 4 && xhr.status === 200) {
